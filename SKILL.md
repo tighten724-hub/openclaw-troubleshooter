@@ -289,6 +289,51 @@ openclaw pairing approve <channel> <code>
 
 ---
 
+## ⚠️ 重要：避免让AI自己"瘫痪"
+
+### 问题
+当AI执行 `openclaw gateway stop` 时：
+- Gateway停止 → WebSocket断开 → AI无法响应 → **瘫痪**
+
+### 解决方案
+
+#### 1. 永远不要让AI自己执行 `gateway stop`
+- 提供命令 → **让用户手动执行**
+- 使用 `gateway restart` 时也要警告用户
+
+#### 2. 使用热重载（推荐）
+大多数配置更改不需要重启Gateway：
+
+```bash
+# 查看热重载配置
+openclaw config get gateway.config.hotReload
+```
+
+设置热重载模式：
+```bash
+openclaw config set gateway.config.hotReload "hybrid"
+```
+
+| 模式 | 行为 |
+|------|------|
+| `hybrid` (默认) | 即时应用安全更改，自动重启关键更改 |
+| `hot` | 仅热应用安全更改 |
+| `restart` | 任何更改都重启 |
+| `off` | 禁用文件监视 |
+
+#### 3. 修改配置的安全流程
+1. 先说明要改什么
+2. 给出修改命令
+3. **建议用户手动执行**
+4. 或让用户确认后再执行
+
+#### 4. 如果必须重启
+1. 警告用户："即将重启Gateway，我会暂时断开连接"
+2. 执行 `openclaw gateway restart`
+3. 提醒用户："Gateway已重启，请刷新页面或重新发送消息"
+
+---
+
 ## 📖 查阅官方文档
 
 当以上解决方案无法解决问题时，按需查阅官方文档：
